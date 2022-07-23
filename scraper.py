@@ -100,7 +100,7 @@ def cookiestring_to_cookies(cookiestring):
     cookiesarray = []
     cookiestring = cookiestring.split('; ')
     for i in cookiestring:
-        if 'Device_Id' in i:
+        if 'Device-Id' in i:
             Device_Id = i.split('=')[1]
         elif 'P_INFO' in i:
             P_INFO = i.split('=')[1]
@@ -245,7 +245,8 @@ else: buff_cookies = cookiestring_to_cookies(buff_cookiesstring)
 """
 
 #Auto-Cookiestring
-buff_cookies = cookiestring_to_cookies(input('input your cookies:'))
+buff_cookiestring = input('input your cookies:')
+buff_cookies = cookiestring_to_cookies(buff_cookiestring)
 
 
 itemarray = []
