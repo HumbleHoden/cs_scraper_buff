@@ -1,4 +1,5 @@
 import os
+from random import randrange
 import time
 import selenium.webdriver as webdriver
 from selenium.webdriver.firefox.service import Service
@@ -8,13 +9,26 @@ import requests
 from requests.auth import HTTPBasicAuth
 import re
 import array
+import random 
+import pandas as pd
 from typing import Pattern
-import random
 pattern = r'\\*u\d{4}'
 pattern2 = r' *'
 localtime = time.localtime()
 print(localtime)
  
+#Variables
+searched_pages = 3
+minprice = 5
+float_decimals = 3
+current_cookiestring = "   "
+#Variables
+
+col1 = 'Item'
+col2 = 'Profitability'
+col3 = 'Currently selling'
+col4 = 'Sell price'
+
 def mergesort(a):
     def perform_merge(a, start, mid, end):
         # Merges two previously sorted arrays
@@ -73,23 +87,23 @@ firefox_service = Service(driver)
 """
 
 #cookie settings
-def cookiestring_to_cookies(cookiestring = ''):
+def cookiestring_to_cookies(cookiestring= current_cookiestring):
     cookiesarray = []
     cookiestring = cookiestring.split('; ')
     for i in cookiestring:
         cookiesarray.append(i.split('=')[1])
 
     Device_Id       = cookiesarray[0]
-    P_INFO          = cookiesarray[1]
-    remember_me     = cookiesarray[2]
-    session         = cookiesarray[3]
-    Locale_Supported= cookiesarray[4]
-    game            = cookiesarray[5]
-    csrf_token      = cookiesarray[6]
-    #_ga             = ""
-    #_gid            = ""
-    NTES_YD_SESS    = ""
-    S_INFO          = ""
+    P_INFO          = cookiesarray[6]
+    remember_me     = cookiesarray[7]
+    session         = cookiesarray[8]
+    Locale_Supported= cookiesarray[2]
+    game            = cookiesarray[3]
+    csrf_token      = cookiesarray[1]
+    #_ga             = " ip "
+    #_gid            = " ip "
+    NTES_YD_SESS    = cookiesarray [4]
+    S_INFO          = cookiesarray [5]
 
     cookies = {'Device-Id': Device_Id
                 ,'Locale-Supported':Locale_Supported
@@ -117,7 +131,8 @@ driver.manage().addCookie('csrf_token',csrf_token)
 default_buff_address = 'https://buff.163.com'
 marketapi = '/api/market/goods?game=csgo&page_num='
 market = '/market/csgo#tab=selling&page_num='
-order = '&min_price=30&sort_by=price.asc'
+minprice_url = '&min_price=' + str(minprice)
+order = minprice_url +'&sort_by=price.asc' 
 goods = '/goods/'
 sellingpage = '?from=market#tab=selling'
 buyorderpage = '?from=market#tab=buying'
@@ -162,6 +177,10 @@ def profitability(self):
     if (float(self.buy_order_prize)) != 0 : return float((float(self.quicksell_price) * (1-float(self.fees)))/(float(self.buy_order_prize)*1.02)-1)
     else: return float(0)
 
+#truncates decimals
+def truncate(n, decimals=0):
+    multiplier = 10 ** decimals
+    return int(n*multiplier) / multiplier
 
 def print_item(self):
     print("The Item " + self.name + " has a profitabiltity of " + str(100 * profitability(self)) + "%" + " and " + str(self.listed_quantity) + " are currently selling\n")
@@ -192,32 +211,44 @@ def extract_items(page_num,itemarray,cookies):
             sell_min_price = float(re.sub(pattern2, '', line.split(':')[1]))
         elif "sell_num:" in line:
             sell_num = int(re.sub(pattern2, '', line.split(':')[1]))
-            item = cs_item(buy_max_price
+            if sell_num >=7 and buy_num >= 5 and buy_max_price <= 200:
+                itemarray.append(cs_item(buy_max_price
                                         ,buy_num
                                         ,steam_price_cny
                                         ,id
                                         ,name
                                         ,quick_price
                                         ,sell_min_price
-                                        ,sell_num)
-            if ('Graffiti' not in name) and ('Souvenir' not in name) and ('Sticker' not in name):
-                if (sell_num >=7) and (buy_num >= 5) and (buy_max_price <= 1000):
-                    itemarray.append(item)
-                    print(name)
+                                        ,sell_num))
+#END Def
 
+
+""" #Manual Cookiestring Input
 buff_cookiesstring = input("Enter cookiestring:")
 if len(buff_cookiesstring) < 15:
     buff_cookies = cookiestring_to_cookies()
 else: buff_cookies = cookiestring_to_cookies(buff_cookiesstring)
+"""
+
+#Auto-Cookiestring
+buff_cookies = cookiestring_to_cookies
+
+
 itemarray = []
-for i in range(150):
+for i in range(searched_pages):
     extract_items(i,itemarray,buff_cookies)
     print(str(i) + '\n')
-    time.sleep(random.uniform(4,6))
+    time.sleep(random.uniform(3.2, 5.1) )
 
+"""
 mergesort(itemarray)
-with open ('ab_30y.txt','w') as f:
+with open ('hurensohn.txt','w') as f:
     for i in itemarray:
-        f.write("The Item " + i.name + " has a profitabiltity of " + str(100 * profitability(i)) + "%" + " and " + str(i.listed_quantity) + " are currently selling\n")
+        f.write("The Item " + i.name + " has a profitabiltity of " + str(truncate(100 * profitability(i), float_decimals)) + "%" + " and " + str(i.listed_quantity) + " are currently selling\n") 
+"""       
+
+data = pd.DataFrame({col1: cs_item.name, col2: profitability, col3: cs_item.listed_quantity})
+data.to_excel('hurensohn.xlsx', sheet_name= 'sheet1', Index = False)
+
 localtime = time.localtime()
 print(localtime)
