@@ -73,7 +73,7 @@ firefox_service = Service(driver)
 """
 
 #cookie settings
-def cookiestring_to_cookies(cookiestring = 'Device-Id=92ET9Lt9PD9W7a2HftiG; P_INFO=49-1631618738|1657789180|1|netease_buff|00&99|null&null&null#DE&null#10#0|&0||49-1631618738; remember_me=U1102023233|TCEWje8qGbaKJrda6KeAVEIWONptrHpy; session=1-9fYgIgHWc5BQS2hjl7OABtN0t4Ir4i5p557idgN6iMVv2036405529; Locale-Supported=en; game=dota2; csrf_token=IjI4ZTIzYmZjMzY2MDYxZDNiOGYwNzI4YmQ0MDg1YmQ1NWJhNDYwNzIi.FbwfCA.AWn0rVIUn60WvXLKMytsk9B6TS4'):
+def cookiestring_to_cookies(cookiestring = ''):
     cookiesarray = []
     cookiestring = cookiestring.split('; ')
     for i in cookiestring:
