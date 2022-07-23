@@ -11,6 +11,7 @@ import re
 import array
 import random 
 import pandas as pd
+import xlsxwriter
 from typing import Pattern
 pattern = r'\\*u\d{4}'
 pattern2 = r' *'
@@ -21,7 +22,7 @@ print(localtime)
 searched_pages = 3
 minprice = 5
 float_decimals = 3
-current_cookiestring = "   "
+current_cookiestring = " "
 #Variables
 
 col1 = 'Item'
@@ -170,9 +171,9 @@ url    = buff_market_url(1)
 
 
 class cs_item:
-    def __init__(self,buy_order_price,buyorders,steamprice_cny,id,name,quicksell_price,listed_prize,listed_quantity,fees = 0.025):
+    def __init__(self,buy_order_prize,buyorders,steamprice_cny,id,name,quicksell_price,listed_prize,listed_quantity,fees = 0.025):
         self.name               = name
-        self.buy_order_price    = buy_order_price
+        self.buy_order_prize    = buy_order_prize
         self.buyorders          = buyorders
         self.listed_prize       = listed_prize
         self.listed_quantity    = listed_quantity
@@ -182,7 +183,7 @@ class cs_item:
         self.fees               = fees
 
 def profitability(self):
-    if (float(self.buy_order_price)) != 0 : return float((float(self.quicksell_price) * (1-float(self.fees)))/(float(self.buy_order_price)*1.02)-1)
+    if (float(self.buy_order_prize)) != 0 : return float((float(self.quicksell_price) * (1-float(self.fees)))/(float(self.buy_order_prize)*1.02)-1)
     else: return float(0)
 
 #truncates decimals
@@ -231,17 +232,16 @@ def extract_items(page_num,itemarray,cookies):
 #END Def
 
 
-""" #Manual Cookiestring Input
+ #Manual Cookiestring Input
 buff_cookiesstring = input("Enter cookiestring:")
 if len(buff_cookiesstring) < 15:
-    buff_cookies = cookiestring_to_cookies()
+    buff_cookies = cookiestring_to_cookies(current_cookiestring)
 else: buff_cookies = cookiestring_to_cookies(buff_cookiesstring)
 """
 
 #Auto-Cookiestring
-buff_cookiestring = input('input your cookies:')
-buff_cookies = cookiestring_to_cookies(buff_cookiestring)
-
+buff_cookies = cookiestring_to_cookies(current_cookiestring)
+"""
 
 itemarray = []
 for i in range(searched_pages):
@@ -249,25 +249,30 @@ for i in range(searched_pages):
     print(str(i) + '\n')
     time.sleep(random.uniform(3.2, 5.1) )
 
-"""
+
 mergesort(itemarray)
-with open ('hurensohn.txt','w') as f:
-    for i in itemarray:
-        f.write("The Item " + i.name + " has a profitabiltity of " + str(truncate(100 * profitability(i), float_decimals)) + "%" + " and " + str(i.listed_quantity) + " are currently selling\n") 
-"""       
+
 
 for i in itemarray:
     names.append(i.name)
-    prof = float(truncate(100 * profitability(i), float_decimals))
-    profitabilitys.append(prof)
-    listed_quantity.append(float(i.listed_quantity))
-    selling_prices.append(float(i.quicksell_price))
-    buyorder_prices.append(float(i.buy_order_price))
+    profitabilitys.append(str(truncate(100 * profitability(i), float_decimals)).replace('.',',') + '%')
+    listed_quantity.append(str(i.listed_quantity) + 'pcs.')
+    selling_prices.append(str(i.quicksell_price).replace('.',',') + '¥')
+    buyorder_prices.append(str(i.buy_order_prize).replace('.',',') + '¥')
 
 
-data = pd.DataFrame({col1: names, col2: profitability, col3: listed_quantity, col4 : selling_prices, col5 : buyorder_prices})
-data.to_excel('hurensohn.xlsx', sheet_name= 'sheet1')
+df = pd.DataFrame({col1: names, col2: profitabilitys, col3: listed_quantity, col4 : selling_prices, col5 : buyorder_prices})
+
+writer = pd.ExcelWriter('hurensohn.xlsx') 
+df.to_excel(writer, sheet_name='sheet1', index=False, na_rep='NaN')
+
+# Auto-adjust columns' width
+for column in df:
+    column_width = max(df[column].astype(str).map(len).max(), len(column))
+    col_idx = df.columns.get_loc(column)
+    writer.sheets['sheet1'].set_column(col_idx, col_idx, column_width)
+
+writer.save()
 
 localtime = time.localtime()
 print(localtime)
-
