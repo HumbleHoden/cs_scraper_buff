@@ -220,15 +220,18 @@ def extract_items(page_num,itemarray,cookies):
             sell_min_price = float(re.sub(pattern2, '', line.split(':')[1]))
         elif "sell_num:" in line:
             sell_num = int(re.sub(pattern2, '', line.split(':')[1]))
-            if sell_num >=7 and buy_num >= 5 and buy_max_price <= 200:
-                itemarray.append(cs_item(buy_max_price
+            item = cs_item(buy_max_price
                                         ,buy_num
                                         ,steam_price_cny
                                         ,id
                                         ,name
                                         ,quick_price
                                         ,sell_min_price
-                                        ,sell_num))
+                                        ,sell_num)
+            if ('Graffiti' not in name) and ('Souvenir' not in name) and ('Sticker' not in name):
+                if (sell_num >=7) and (buy_num >= 5) and (buy_max_price <= 1000):
+                    itemarray.append(item)
+                    print(name)
 #END Def
 
 
@@ -238,7 +241,6 @@ if len(buff_cookiesstring) < 15:
     buff_cookies = cookiestring_to_cookies(current_cookiestring)
 else: buff_cookies = cookiestring_to_cookies(buff_cookiesstring)
 """
-
 #Auto-Cookiestring
 buff_cookies = cookiestring_to_cookies(current_cookiestring)
 """
