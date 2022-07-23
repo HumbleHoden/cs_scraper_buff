@@ -28,6 +28,15 @@ col1 = 'Item'
 col2 = 'Profitability'
 col3 = 'Currently selling'
 col4 = 'Sell price'
+col5 = 'buyorder price'
+
+#arrays for excel inclusion
+names           = []
+profitabilitys  = []
+listed_quantity = []
+selling_prices  = []
+buyorder_prices = []
+
 
 def mergesort(a):
     def perform_merge(a, start, mid, end):
@@ -247,7 +256,15 @@ with open ('hurensohn.txt','w') as f:
         f.write("The Item " + i.name + " has a profitabiltity of " + str(truncate(100 * profitability(i), float_decimals)) + "%" + " and " + str(i.listed_quantity) + " are currently selling\n") 
 """       
 
-data = pd.DataFrame({col1: cs_item.name, col2: profitability, col3: cs_item.listed_quantity})
+for i in itemarray:
+    names.append(i.name)
+    profitabilitys.append(float(profitability(i)))
+    listed_quantity.append(i.listed_quantity)
+    selling_prices.append(i.quicksell_price)
+    buyorder_prices.append(i.buy_order_price)
+
+
+data = pd.DataFrame({col1: names, col2: profitability, col3: listed_quantity, col4 : selling_prices, col5 : buyorder_prices})
 data.to_excel('hurensohn.xlsx', sheet_name= 'sheet1', Index = False)
 
 localtime = time.localtime()
