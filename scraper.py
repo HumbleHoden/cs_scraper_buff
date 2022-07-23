@@ -96,23 +96,28 @@ firefox_service = Service(driver)
 """
 
 #cookie settings
-def cookiestring_to_cookies(cookiestring= current_cookiestring):
+def cookiestring_to_cookies(cookiestring):
     cookiesarray = []
     cookiestring = cookiestring.split('; ')
     for i in cookiestring:
-        cookiesarray.append(i.split('=')[1])
-
-    Device_Id       = cookiesarray[0]
-    P_INFO          = cookiesarray[6]
-    remember_me     = cookiesarray[7]
-    session         = cookiesarray[8]
-    Locale_Supported= cookiesarray[2]
-    game            = cookiesarray[3]
-    csrf_token      = cookiesarray[1]
-    #_ga             = " ip "
-    #_gid            = " ip "
-    NTES_YD_SESS    = cookiesarray [4]
-    S_INFO          = cookiesarray [5]
+        if 'Device_Id' in i:
+            Device_Id = i.split('=')[1]
+        elif 'P_INFO' in i:
+            P_INFO = i.split('=')[1]
+        elif 'remember_me' in i:
+            remember_me = i.split('=')[1]
+        elif 'session' in i:
+            session = i.split('=')[1]
+        elif 'Locale-Supported' in i:
+            Locale_Supported = i.split('=')[1]
+        elif 'game' in i:
+            game = i.split('=')[1]
+        elif 'csrf_token' in i:
+            csrf_token = i.split('=')[1]
+        elif 'NTES_YD_SESS' in i:
+            NTES_YD_SESS = i.split('=')[1]
+        elif 'S_INFO' in i:
+            S_INFO = i.split('=')[1]
 
     cookies = {'Device-Id': Device_Id
                 ,'Locale-Supported':Locale_Supported
@@ -240,7 +245,7 @@ else: buff_cookies = cookiestring_to_cookies(buff_cookiesstring)
 """
 
 #Auto-Cookiestring
-buff_cookies = cookiestring_to_cookies
+buff_cookies = cookiestring_to_cookies(input('input your cookies:'))
 
 
 itemarray = []
@@ -269,3 +274,4 @@ data.to_excel('hurensohn.xlsx', sheet_name= 'sheet1', Index = False)
 
 localtime = time.localtime()
 print(localtime)
+
