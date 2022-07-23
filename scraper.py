@@ -114,16 +114,10 @@ def cookiestring_to_cookies(cookiestring):
             game = i.split('=')[1]
         elif 'csrf_token' in i:
             csrf_token = i.split('=')[1]
-        elif 'NTES_YD_SESS' in i:
-            NTES_YD_SESS = i.split('=')[1]
-        elif 'S_INFO' in i:
-            S_INFO = i.split('=')[1]
 
     cookies = {'Device-Id': Device_Id
                 ,'Locale-Supported':Locale_Supported
                 ,'game':game
-                ,'NTES_YD_SESS':NTES_YD_SESS
-                ,'S_INFO':S_INFO
                 ,'P_INFO':P_INFO
                 ,'remember_me':remember_me
                 ,'session':session
@@ -176,9 +170,9 @@ url    = buff_market_url(1)
 
 
 class cs_item:
-    def __init__(self,buy_order_prize,buyorders,steamprice_cny,id,name,quicksell_price,listed_prize,listed_quantity,fees = 0.025):
+    def __init__(self,buy_order_price,buyorders,steamprice_cny,id,name,quicksell_price,listed_prize,listed_quantity,fees = 0.025):
         self.name               = name
-        self.buy_order_prize    = buy_order_prize
+        self.buy_order_price    = buy_order_price
         self.buyorders          = buyorders
         self.listed_prize       = listed_prize
         self.listed_quantity    = listed_quantity
@@ -188,7 +182,7 @@ class cs_item:
         self.fees               = fees
 
 def profitability(self):
-    if (float(self.buy_order_prize)) != 0 : return float((float(self.quicksell_price) * (1-float(self.fees)))/(float(self.buy_order_prize)*1.02)-1)
+    if (float(self.buy_order_price)) != 0 : return float((float(self.quicksell_price) * (1-float(self.fees)))/(float(self.buy_order_price)*1.02)-1)
     else: return float(0)
 
 #truncates decimals
@@ -264,14 +258,15 @@ with open ('hurensohn.txt','w') as f:
 
 for i in itemarray:
     names.append(i.name)
-    profitabilitys.append(float(truncate(100 * profitability(i), float_decimals)))
+    prof = float(truncate(100 * profitability(i), float_decimals))
+    profitabilitys.append(prof)
     listed_quantity.append(float(i.listed_quantity))
     selling_prices.append(float(i.quicksell_price))
     buyorder_prices.append(float(i.buy_order_price))
 
 
 data = pd.DataFrame({col1: names, col2: profitability, col3: listed_quantity, col4 : selling_prices, col5 : buyorder_prices})
-data.to_excel('hurensohn.xlsx', sheet_name= 'sheet1', Index = False)
+data.to_excel('hurensohn.xlsx', sheet_name= 'sheet1')
 
 localtime = time.localtime()
 print(localtime)
