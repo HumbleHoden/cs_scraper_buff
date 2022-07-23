@@ -258,10 +258,10 @@ with open ('hurensohn.txt','w') as f:
 
 for i in itemarray:
     names.append(i.name)
-    profitabilitys.append(float(profitability(i)))
-    listed_quantity.append(i.listed_quantity)
-    selling_prices.append(i.quicksell_price)
-    buyorder_prices.append(i.buy_order_price)
+    profitabilitys.append(float(truncate(100 * profitability(i), float_decimals)))
+    listed_quantity.append(float(i.listed_quantity))
+    selling_prices.append(float(i.quicksell_price))
+    buyorder_prices.append(float(i.buy_order_price))
 
 
 data = pd.DataFrame({col1: names, col2: profitability, col3: listed_quantity, col4 : selling_prices, col5 : buyorder_prices})
